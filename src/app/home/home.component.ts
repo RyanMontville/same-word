@@ -1,16 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [FormsModule, CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  word: string | null = null;
-  gameStart: boolean = true;
   round: number = 1;
+  lastWordOne: string | null = null;
+  lastWordTwo: string | null = null;
+  word: string | null = null;
+  message: string = "";
+  guess: string = "";
+  newWord: string = "";
+  incorrect: boolean = false;
+  gameWon: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -20,8 +28,8 @@ export class HomeComponent implements OnInit {
    ngOnInit() {
     let roundString = this.route.snapshot.queryParamMap.get('round');
     if (roundString) {
-      if (typeof roundString === 'number') {
-        this.round = roundString;
+      if (typeof +roundString === 'number') {
+        this.round = +roundString;
       } else {
         this.round = 1;
       }
@@ -31,15 +39,20 @@ export class HomeComponent implements OnInit {
     let wordString = this.route.snapshot.queryParamMap.get('word');
     if (wordString) {
       this.word = this.convertToString(wordString);
-      this.gameStart = false;
-    } else {
-      this.gameStart = true;
     }
-    if (this.word) {
-      this.convertToString(this.word);
-      this.gameStart = false;
-    } else {
-      this.gameStart = true;
+    let lastOne = this.route.snapshot.queryParamMap.get('lastOne');
+    let lastTwo = this.route.snapshot.queryParamMap.get('lastTwo');
+    if (lastOne) {
+      this.lastWordOne = lastOne;
+      this.lastWordTwo = lastTwo;
+      this.message = `Your friend didn't guess the same word as you. You now need to think of a word that links ${lastOne} and ${lastTwo}:`;
+    }
+    if (this.round == 1) {
+      if (!this.word) {
+        this.message = "Welcome to Say the same thing! Your goal is to say the same thing as your friend. You go first! Type in any word you can think of:";
+      } else {
+        this.message = "Your friend has sent a word. Now its your turn to type any word you can think of:";
+      }
     }
   }
 
@@ -50,5 +63,26 @@ export class HomeComponent implements OnInit {
   convertToString(base64: string) {
     var decodedString = atob(base64);
     return decodedString;
+  }
+
+  onSubmit() {
+    if (this.round === 1 && !this.word) {
+      let encodedWord = this.convertTo64(this.newWord);
+      let urlString = `ryanmontville.com/same-word?round=1&word=${encodedWord}`;
+      this.message = `Share this url with your friend to continue playing the game: ${urlString}`;
+    } else {
+      if (this.newWord.toLocaleLowerCase() === this.word?.toLocaleLowerCase() && this.incorrect === false) {
+        this.gameWon = true;
+      } else if (this.incorrect === false) {
+        this.incorrect = true;
+        this.message = `Sorry, you didn't say the same thing as your friend. You now need to think of a word that links ${this.word} and ${this.newWord}`;
+        this.guess = this.newWord;
+        this.round += 1;
+      } else {
+        let encodedWord = this.convertTo64(this.newWord);
+        let urlString = `ryanmontville.com/same-word?round=${this.round}&lastOne=${this.word}&lastTwo=${this.guess}&word=${encodedWord}`;
+        this.message = `Share this url with your friend to continue playing the game: ${urlString}`;
+      }
+    }
   }
 }

@@ -1,5 +1,13 @@
-<p>home works!</p>
-@if (gameStart) {
-    <p>Welcome to Say the same thing! This game is based off of Ok Go's app, which sadly is no longer availible.</p>
+@if (!gameWon) {
+    <h2>Round {{round}}</h2>
+    <p>{{message}}</p>
+    <div class="inputGroup">
+        <input [(ngModel)]="newWord" type="text" placeholder="Enter your word here" class="wordTextBar"
+            (keydown.enter)="onSubmit()" />
+        <button (click)="onSubmit()">Submit</button>
+    </div>
 }
-<p>{{word}}</p>
+
+@if (gameWon) {
+    <p>Congratulations! you both managed to say {{newWord}} after {{round}} rounds!</p>
+}
