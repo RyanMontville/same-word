@@ -22,6 +22,7 @@ export class HomeComponent implements OnInit {
   gameWon: boolean = false;
   urlString: string = "";
   showCopyButton: boolean = false;
+  messageParts: {text: string, weight: string}[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -48,16 +49,16 @@ export class HomeComponent implements OnInit {
     let lastTwo = this.route.snapshot.queryParamMap.get('lastTwo');
     if (lastOne && lastTwo) {
       let fixedo = lastOne.replace("-", " ");
-      let fixedt = lastTwo?.replace("-", " ")
+      let fixedt = lastTwo?.replace("-", " ");
       this.lastWordOne = fixedo;
       this.lastWordTwo = fixedt;
-      this.message = `Your friend didn't guess the same word as you. You now need to think of a word that links ${lastOne} and ${lastTwo}:`;
+      this.message = `<p>Your friend didn't guess the same word as you.</p><p>Find a word to connect <strong>${fixedo}</strong> and <strong>${fixedt}</strong>:</p>`;
     }
     if (this.round == 1) {
       if (!this.word) {
-        this.message = "Welcome to Say the same thing! Your goal is to say the same thing as your friend. You go first! Type in any word you can think of:";
+        this.message = "<p>Welcome to Say the same thing! Your goal is to say the same thing as your friend.</p><p>You go first! Type in any word you can think of:</p>";
       } else {
-        this.message = "Your friend has sent a word. Now its your turn to type any word you can think of:";
+        this.message = "<p>Your friend has sent a word.</p><p>Now its your turn to type any word you can think of:</p>";
       }
     }
   }
@@ -75,14 +76,14 @@ export class HomeComponent implements OnInit {
     if (this.round === 1 && !this.word) {
       let encodedWord = this.convertTo64(this.newWord);
       this.urlString = `ryanmontville.com/same-word?round=1&word=${encodedWord}`;
-      this.message = `Share this url with your friend to continue playing the game: ${this.urlString}`;
+      this.message = `<p>Share this url with your friend to continue playing the game: <strong>${this.urlString}</strong></p><p>or</p>`;
       this.showCopyButton = true;
     } else {
       if (this.newWord.toLocaleLowerCase() === this.word?.toLocaleLowerCase() && this.incorrect === false) {
         this.gameWon = true;
       } else if (this.incorrect === false) {
         this.incorrect = true;
-        this.message = `Sorry, you didn't say the same thing as your friend. You now need to think of a word that links ${this.word} and ${this.newWord}`;
+        this.message = `<p>Sorry, you didn't say the same thing as your friend.</p><p>Find a word to connect <strong>${this.word}</strong> and <strong>${this.newWord}</strong>.</p>`;
         this.guess = this.newWord;
         this.newWord = "";
         this.round += 1;
@@ -91,16 +92,20 @@ export class HomeComponent implements OnInit {
         let lo = this.word?.replace(" ", "-");
         let lt = this.guess.replace(" ", "-");
         this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${lo}&lastTwo=${lt}&word=${encodedWord}`;
-        this.message = `Share this url with your friend to continue playing the game: ${this.urlString}`;
+        this.message = `<p>Share this url with your friend to continue playing the game: <strong>${this.urlString}</strong></p><p>or</p>`;
         this.showCopyButton = true;
       }
     }
   }
 
   copyToClipboard() {
-    var messageToCopy: string = `Say the Same Thing Round ${this.round}
+    var messageToCopy: string = `🗣️Say the Same Thing Round ${this.round}
   Its your turn!
-  ${this.urlString}`;
+  🔗: ${this.urlString}`;
     this.clipboard.copy(messageToCopy);
+  }
+
+  getMessage() {
+    return this.message;
   }
 }

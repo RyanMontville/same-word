@@ -1,13 +1,15 @@
 @if (!gameWon) {
     <h2>Round {{round}}</h2>
-    <p>{{message}}</p>
-    <div class="inputGroup">
-        <input [(ngModel)]="newWord" type="text" placeholder="Enter your word here" class="wordTextBar"
-            (keydown.enter)="onSubmit()" />
-        <button (click)="onSubmit()">Submit</button>
-    </div>
+    <div [innerHTML]="message"></div>
+    @if (!showCopyButton) {
+        <div class="inputGroup">
+            <input [(ngModel)]="newWord" type="text" placeholder="Enter your word here" class="wordTextBar"
+                (keydown.enter)="onSubmit()" />
+            <button (click)="onSubmit()">Submit</button>
+        </div>
+    }
     @if (showCopyButton) {
-        <p><button (click)="copyToClipboard()">Click here</button>  to copy the message to your clipboard</p>
+        <p><button (click)="copyToClipboard()">Click here to copy the message to your clipboard</button></p>
     }
 }
 

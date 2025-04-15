@@ -1,1 +1,109 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,1,0');
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff&family=Roboto+Slab&family=Roboto:wght@400;900&display=swap');
+
+@media (prefers-color-scheme: dark) {
+    :root {
+      --main-color: #b81f24;
+      --header-text-color: #fff;
+      --border-radius: 0.375em;
+      --background-color: #000000;
+      --text-color: #ccc;
+      --input-background: #545454;
+      --input-text: #000000;
+      --link-color: #fff;
+    }
+  }
+  
+  @media (prefers-color-scheme: light) {
+    :root {
+      --main-color: #b81f24;
+      --header-text-color: #fff;
+      --border-radius: 0.375em;
+      --background-color: #e5e5e5;
+      --text-color: #000000;
+      --input-background: #eee;
+      --input-text: #555;
+      --link-color: #000;
+    }
+  }
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: 'Roboto Slab';
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+@media only screen and (min-width: 671px) {
+    main {
+        max-width: 900px;
+        margin: 5px auto;
+    }
+}
+@media only screen and (max-width: 670px) {
+    main {
+        margin: 20px;
+    }
+}
+
+
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button,
+.button,
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  border-radius: var(--border-radius);
+  background-color: transparent;
+  border: 0;
+  display: inline-block;
+  min-height: 3.5em;
+  line-height: 3.5em;
+  padding: 0 2.25em;
+  text-decoration: none;
+  margin: 0.25em 0.25em;
+  font-size: 0.8em;
+}
+
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button,
+.button {
+  box-shadow: inset 0 0 0 2px var(--main-color);
+  color: var(--main-color);
+  font-weight: 700;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+input,
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  background-color: var(--input-background);
+  border: 1px solid var(--input-text);
+  color: var(--input-text);
+  outline: none;
+  padding: 0 0.75em;
+  font-weight: bold;
+}
+
+button:hover, .button:hover {
+  background-color: var(--main-color);
+  color: #ffffff;
+}
+
+p {
+    margin: 10px 0;
+}
