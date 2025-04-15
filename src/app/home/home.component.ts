@@ -46,9 +46,11 @@ export class HomeComponent implements OnInit {
     }
     let lastOne = this.route.snapshot.queryParamMap.get('lastOne');
     let lastTwo = this.route.snapshot.queryParamMap.get('lastTwo');
-    if (lastOne) {
-      this.lastWordOne = lastOne;
-      this.lastWordTwo = lastTwo;
+    if (lastOne && lastTwo) {
+      let fixedo = lastOne.replace("-", " ");
+      let fixedt = lastTwo?.replace("-", " ")
+      this.lastWordOne = fixedo;
+      this.lastWordTwo = fixedt;
       this.message = `Your friend didn't guess the same word as you. You now need to think of a word that links ${lastOne} and ${lastTwo}:`;
     }
     if (this.round == 1) {
@@ -61,14 +63,12 @@ export class HomeComponent implements OnInit {
   }
 
   convertTo64(word: string) {
-    var fixed = word.replace(" ", "-");
-    var encodedString = btoa(fixed);
+    var encodedString = btoa(word);
     return encodedString;
   }
   convertToString(base64: string) {
     var decodedString = atob(base64);
-    var unfixed = decodedString.replace("-", " ");
-    return unfixed;
+    return decodedString;
   }
 
   onSubmit() {
@@ -84,10 +84,13 @@ export class HomeComponent implements OnInit {
         this.incorrect = true;
         this.message = `Sorry, you didn't say the same thing as your friend. You now need to think of a word that links ${this.word} and ${this.newWord}`;
         this.guess = this.newWord;
+        this.newWord = "";
         this.round += 1;
       } else {
         let encodedWord = this.convertTo64(this.newWord);
-        this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${this.word}&lastTwo=${this.guess}&word=${encodedWord}`;
+        let lo = this.word?.replace(" ", "-");
+        let lt = this.guess.replace(" ", "-");
+        this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${lo}&lastTwo=${lt}&word=${encodedWord}`;
         this.message = `Share this url with your friend to continue playing the game: ${this.urlString}`;
         this.showCopyButton = true;
       }
