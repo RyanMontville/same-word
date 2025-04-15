@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import {Clipboard} from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-home',
@@ -19,10 +20,13 @@ export class HomeComponent implements OnInit {
   newWord: string = "";
   incorrect: boolean = false;
   gameWon: boolean = false;
+  urlString: string = "";
+  showCopyButton: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private clipboard: Clipboard
   ) {}
 
    ngOnInit() {
@@ -57,19 +61,22 @@ export class HomeComponent implements OnInit {
   }
 
   convertTo64(word: string) {
-    var encodedString = btoa(word);
+    var fixed = word.replace(" ", "-");
+    var encodedString = btoa(fixed);
     return encodedString;
   }
   convertToString(base64: string) {
     var decodedString = atob(base64);
-    return decodedString;
+    var unfixed = decodedString.replace("-", " ");
+    return unfixed;
   }
 
   onSubmit() {
     if (this.round === 1 && !this.word) {
       let encodedWord = this.convertTo64(this.newWord);
-      let urlString = `ryanmontville.com/same-word?round=1&word=${encodedWord}`;
-      this.message = `Share this url with your friend to continue playing the game: ${urlString}`;
+      this.urlString = `ryanmontville.com/same-word?round=1&word=${encodedWord}`;
+      this.message = `Share this url with your friend to continue playing the game: ${this.urlString}`;
+      this.showCopyButton = true;
     } else {
       if (this.newWord.toLocaleLowerCase() === this.word?.toLocaleLowerCase() && this.incorrect === false) {
         this.gameWon = true;
@@ -80,9 +87,17 @@ export class HomeComponent implements OnInit {
         this.round += 1;
       } else {
         let encodedWord = this.convertTo64(this.newWord);
-        let urlString = `ryanmontville.com/same-word?round=${this.round}&lastOne=${this.word}&lastTwo=${this.guess}&word=${encodedWord}`;
-        this.message = `Share this url with your friend to continue playing the game: ${urlString}`;
+        this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${this.word}&lastTwo=${this.guess}&word=${encodedWord}`;
+        this.message = `Share this url with your friend to continue playing the game: ${this.urlString}`;
+        this.showCopyButton = true;
       }
     }
+  }
+
+  copyToClipboard() {
+    var messageToCopy: string = `Say the Same Thing Round ${this.round}
+  Its your turn!
+  ${this.urlString}`;
+    this.clipboard.copy(messageToCopy);
   }
 }

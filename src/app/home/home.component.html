@@ -6,6 +6,9 @@
             (keydown.enter)="onSubmit()" />
         <button (click)="onSubmit()">Submit</button>
     </div>
+    @if (showCopyButton) {
+        <p><button (click)="copyToClipboard()">Click here</button>  to copy the message to your clipboard</p>
+    }
 }
 
 @if (gameWon) {
