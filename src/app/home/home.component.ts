@@ -2,11 +2,27 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {Clipboard} from '@angular/cdk/clipboard';
+import { Clipboard } from '@angular/cdk/clipboard';
+import { trigger, state, style, transition, animate } from '@angular/animations';
+import { fadeInUpAnimation } from '../animation.service';
 
 @Component({
   selector: 'app-home',
   imports: [FormsModule, CommonModule],
+  animations: [
+    trigger('cardAnimation', [
+      state('in', style({ opacity: 1, transform: 'translateX(0)' })),
+      state('out', style({ opacity: 0, transform: 'translateX(100%)' })),
+      transition('void => in', [ // Animate in from the left
+        style({ opacity: 0, transform: 'translateX(-100%)' }),
+        animate('300ms ease-in')
+      ]),
+      transition('in => out', [
+        animate('300ms ease-out')
+      ]),
+      transition('void => *', animate('0ms')),
+    ]),
+  ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -14,23 +30,29 @@ export class HomeComponent implements OnInit {
   round: number = 1;
   lastWordOne: string | null = null;
   lastWordTwo: string | null = null;
-  word: string | null = null;
+  theirWord: string | null = null;
+  yourWord: string = "";
   message: string = "";
-  guess: string = "";
   newWord: string = "";
-  incorrect: boolean = false;
-  gameWon: boolean = false;
+
   urlString: string = "";
-  showCopyButton: boolean = false;
-  messageParts: {text: string, weight: string}[] = [];
+
+  showPromptCard: boolean = true;
+  showIncorrectCard: boolean = false;
+  showShareCard: boolean = false;
+  showCorrectCard: boolean = false;
+  promptCardState: string = 'in';
+  incorrectCardState: string = 'out';
+  shareCardState: string = 'out';
+  correctCardState: string = 'out';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private clipboard: Clipboard
-  ) {}
+  ) { }
 
-   ngOnInit() {
+  ngOnInit() {
     let roundString = this.route.snapshot.queryParamMap.get('round');
     if (roundString) {
       if (typeof +roundString === 'number') {
@@ -43,7 +65,7 @@ export class HomeComponent implements OnInit {
     }
     let wordString = this.route.snapshot.queryParamMap.get('word');
     if (wordString) {
-      this.word = this.convertToString(wordString);
+      this.theirWord = this.convertToString(wordString);
     }
     let lastOne = this.route.snapshot.queryParamMap.get('lastOne');
     let lastTwo = this.route.snapshot.queryParamMap.get('lastTwo');
@@ -52,11 +74,11 @@ export class HomeComponent implements OnInit {
       let fixedt = lastTwo?.replace("-", " ");
       this.lastWordOne = fixedo;
       this.lastWordTwo = fixedt;
-      this.message = `<p>Your friend didn't guess the same word as you.</p><p>Find a word to connect <strong>${fixedo}</strong> and <strong>${fixedt}</strong>:</p>`;
+      this.message = `<p>Your friend didn't guess the same word as you.</p><p>Find a word(s) to connect <strong>${fixedo}</strong> and <strong>${fixedt}</strong>:</p>`;
     }
     if (this.round == 1) {
-      if (!this.word) {
-        this.message = "<p>Welcome to Say the same thing! Your goal is to say the same thing as your friend.</p><p>You go first! Type in any word you can think of:</p>";
+      if (!this.theirWord) {
+        this.message = "<p>You go first! Type in any word you can think of:</p>";
       } else {
         this.message = "<p>Your friend has sent a word.</p><p>Now its your turn to type any word you can think of:</p>";
       }
@@ -72,40 +94,63 @@ export class HomeComponent implements OnInit {
     return decodedString;
   }
 
-  onSubmit() {
-    if (this.round === 1 && !this.word) {
-      let encodedWord = this.convertTo64(this.newWord);
-      this.urlString = `ryanmontville.com/same-word?round=1&word=${encodedWord}`;
-      this.message = `<p>Share this url with your friend to continue playing the game: <strong>${this.urlString}</strong></p><p>or</p>`;
-      this.showCopyButton = true;
-    } else {
-      if (this.newWord.toLocaleLowerCase() === this.word?.toLocaleLowerCase() && this.incorrect === false) {
-        this.gameWon = true;
-      } else if (this.incorrect === false) {
-        this.incorrect = true;
-        this.message = `<p>Sorry, you didn't say the same thing as your friend.</p><p>Find a word to connect <strong>${this.word}</strong> and <strong>${this.newWord}</strong>.</p>`;
-        this.guess = this.newWord;
-        this.newWord = "";
-        this.round += 1;
+  onSubmit(action: number) {
+    if (action === 1) {
+      if (this.round === 1 && !this.theirWord) {
+        let encodedWord = this.convertTo64(this.yourWord);
+        this.urlString = `https://ryanmontville.com/same-word?round=1&word=${encodedWord}`;
+        this.promptCardState = 'out';
+        setTimeout(() => {
+          this.showPromptCard = false;
+          this.showShareCard = true;
+          this.shareCardState = 'in';
+        }, 300);
       } else {
-        let encodedWord = this.convertTo64(this.newWord);
-        let lo = this.word?.replace(" ", "-");
-        let lt = this.guess.replace(" ", "-");
-        this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${lo}&lastTwo=${lt}&word=${encodedWord}`;
-        this.message = `<p>Share this url with your friend to continue playing the game: <strong>${this.urlString}</strong></p><p>or</p>`;
-        this.showCopyButton = true;
+        if (this.yourWord.toLowerCase() === this.theirWord?.toLocaleLowerCase()) {
+          this.promptCardState = 'out';
+          setTimeout(() => {
+            this.showPromptCard = false;
+            this.showCorrectCard = true;
+            this.correctCardState = 'in';
+          }, 300);
+        } else {
+          this.promptCardState = 'out';
+          setTimeout(() => {
+            this.showPromptCard = false;
+            this.showIncorrectCard = true;
+            this.incorrectCardState = 'in';
+          }, 300);
+        }
       }
+    }
+    if (action === 2) {
+      this.round += 1;
+      this.incorrectCardState = 'out';
+      let encodedWord = this.convertTo64(this.newWord);
+      let lo = this.theirWord?.replace(" ", "-");
+      let lt = this.yourWord.replace(" ", "-");
+      this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${lo}&lastTwo=${lt}&word=${encodedWord}`;
+          setTimeout(() => {
+            this.showIncorrectCard = false;
+            this.showShareCard = true;
+            this.shareCardState = 'in';
+          }, 300);
     }
   }
 
-  copyToClipboard() {
-    var messageToCopy: string = `🗣️Say the Same Thing Round ${this.round}
-  Its your turn!
-  🔗: ${this.urlString}`;
+  copyToClipboard(action: number) {
+    var messageToCopy: string = "";
+    if (action == 1) {
+      messageToCopy= `🗣️Say the Same Thing Round ${this.round}\nIts your turn!\n🔗: ${this.urlString}`;
+    } else {
+      messageToCopy = `🗣️Say the Same Thing\nCongratulations! you both managed to say ${this.yourWord} after ${this.round} rounds!`
+    }
     this.clipboard.copy(messageToCopy);
   }
+  
 
-  getMessage() {
-    return this.message;
+  playAgain() {
+    this.router.navigate(['/']);
   }
 }
+

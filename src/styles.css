@@ -11,6 +11,7 @@
       --input-background: #545454;
       --input-text: #000000;
       --link-color: #fff;
+      --card-background: #333;
     }
   }
   
@@ -24,6 +25,7 @@
       --input-background: #eee;
       --input-text: #555;
       --link-color: #000;
+      --card-background: #fff;
     }
   }
 
@@ -106,4 +108,10 @@ button:hover, .button:hover {
 
 p {
     margin: 10px 0;
+}
+
+button:disabled,
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

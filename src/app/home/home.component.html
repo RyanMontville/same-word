@@ -1,18 +1,50 @@
-@if (!gameWon) {
+<div id="container">
     <h2>Round {{round}}</h2>
-    <div [innerHTML]="message"></div>
-    @if (!showCopyButton) {
+    @if (showPromptCard) {
+    <div class="card" id="promptCard" [@cardAnimation]="promptCardState">
+        @if (round == 1) {
+        <p>Welcome to same the Same Thing! The goal of this game is to say the same thing as your friend. If you say
+            "hamburger" and your friend say "fries", then you have to think of a word that links those two words. If you
+            both say "fast food" you win!. If you say "fast food" but your friend says "unhealthy", then you keep
+            playing until you say the same thing.</p>
+        }
+        <div [innerHTML]="message"></div>
         <div class="inputGroup">
-            <input [(ngModel)]="newWord" type="text" placeholder="Enter your word here" class="wordTextBar"
-                (keydown.enter)="onSubmit()" />
-            <button (click)="onSubmit()">Submit</button>
+            <input [(ngModel)]="yourWord" type="text" placeholder="Enter your word(s) here" class="wordTextBar"
+                (keydown.enter)="onSubmit(1)" />
+            <button (click)="onSubmit(1)">Submit</button>
         </div>
+    </div>
     }
-    @if (showCopyButton) {
-        <p><button (click)="copyToClipboard()">Click here to copy the message to your clipboard</button></p>
+    @if (showIncorrectCard) {
+    <div class="card" id="incorrectCard" [@cardAnimation]="incorrectCardState">
+        <p>You didn't say the same thing. Its your tunr to find a word that links <strong>{{theirWord}}</strong> and
+            <strong>{{yourWord}}</strong>:</p>
+        <div class="inputGroup">
+            <input [(ngModel)]="newWord" type="text" placeholder="Enter your word(s) here" class="wordTextBar"
+                (keydown.enter)="onSubmit(2)" />
+            <button (click)="onSubmit(2)">Submit</button>
+        </div>
+    </div>
     }
-}
-
-@if (gameWon) {
-    <p>Congratulations! you both managed to say {{newWord}} after {{round}} rounds!</p>
-}
+    @if (showShareCard) {
+    <div class="card" id="shareCard" [@cardAnimation]="shareCardState">
+        <p>Now Share this link with your friend to keep playing:</p>
+        <p><strong>{{urlString}}</strong></p>
+        <p>OR</p>
+        @if (round < 3) { <p>Click the button below, then paste the message into your text/email/message to your friend.
+            </p>
+            }
+            <button (click)="copyToClipboard(1)">Click here to copy the message to share</button>
+    </div>
+    }
+    @if (showCorrectCard) {
+    <div class="card" id="correctCard" [@cardAnimation]="correctCardState">
+        <p>Congratulations! you both managed to say <strong>{{yourWord}}</strong> after {{round}} rounds!</p>
+        <div class="btnWrapper">
+            <button (click)="copyToClipboard(2)">Click here to copy the message to share</button>
+            <button (click)="playAgain()">Play Again</button>
+        </div>
+    </div>
+    }
+</div>
