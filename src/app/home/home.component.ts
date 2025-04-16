@@ -150,6 +150,19 @@ export class HomeComponent implements OnInit {
   
 
   playAgain() {
+    this.round = 1;
+    this.lastWordOne = null;
+    this.lastWordTwo = null;
+    this.theirWord = null;
+    this.yourWord= "";
+    this.newWord = "";
+    this.message = "<p>You go first! Type in any word you can think of:</p>";
+    this.correctCardState = 'out';
+    setTimeout(() => {
+      this.showCorrectCard = false;
+      this.showPromptCard = true;
+      this.promptCardState = 'in';
+    }, 300);
     this.router.navigate(['/']);
   }
 }
