@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { trigger, state, style, transition, animate } from '@angular/animations';
-import { fadeInUpAnimation } from '../animation.service';
 
 @Component({
   selector: 'app-home',
@@ -45,6 +44,7 @@ export class HomeComponent implements OnInit {
   incorrectCardState: string = 'out';
   shareCardState: string = 'out';
   correctCardState: string = 'out';
+  textedWon: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -70,8 +70,8 @@ export class HomeComponent implements OnInit {
     let lastOne = this.route.snapshot.queryParamMap.get('lastOne');
     let lastTwo = this.route.snapshot.queryParamMap.get('lastTwo');
     if (lastOne && lastTwo) {
-      let fixedo = lastOne.replace("-", " ");
-      let fixedt = lastTwo?.replace("-", " ");
+      let fixedo = lastOne?.split("-").join(" ");
+      let fixedt = lastTwo?.split("-").join(" ");
       this.lastWordOne = fixedo;
       this.lastWordTwo = fixedt;
       this.message = `<p>Your friend didn't guess the same word as you.</p><p>Find a word(s) to connect <strong>${fixedo}</strong> and <strong>${fixedt}</strong>:</p>`;
@@ -82,6 +82,17 @@ export class HomeComponent implements OnInit {
       } else {
         this.message = "<p>Your friend has sent a word.</p><p>Now its your turn to type any word you can think of:</p>";
       }
+    }
+    let won = this.route.snapshot.queryParamMap.get('won');
+    if (won) {
+      this.yourWord = won?.split("-").join(" ");
+      this.textedWon = true;
+      this.promptCardState = 'out';
+          setTimeout(() => {
+            this.showPromptCard = false;
+            this.showCorrectCard = true;
+            this.correctCardState = 'in';
+          }, 300);
     }
   }
 
@@ -127,8 +138,8 @@ export class HomeComponent implements OnInit {
       this.round += 1;
       this.incorrectCardState = 'out';
       let encodedWord = this.convertTo64(this.newWord);
-      let lo = this.theirWord?.replace(" ", "-");
-      let lt = this.yourWord.replace(" ", "-");
+      let lo = this.theirWord?.split(" ").join("-");
+      let lt = this.yourWord.split(" ").join("-");
       this.urlString = `https://ryanmontville.com/same-word?round=${this.round}&lastOne=${lo}&lastTwo=${lt}&word=${encodedWord}`;
           setTimeout(() => {
             this.showIncorrectCard = false;
@@ -143,7 +154,10 @@ export class HomeComponent implements OnInit {
     if (action == 1) {
       messageToCopy= `🗣️Say the Same Thing Round ${this.round}\nIts your turn!\n🔗: ${this.urlString}`;
     } else {
-      messageToCopy = `🗣️Say the Same Thing\nCongratulations! you both managed to say ${this.yourWord} after ${this.round} rounds!`
+      let lo = this.theirWord?.split(" ").join("-");
+      let lt = this.yourWord.split(" ").join("-");
+      let url = `https://ryanmontville.com/same-word?round=${this.round}&won=${this.yourWord}&lastOne=${lo}&lastTwo=${lt}`
+      messageToCopy = `🗣️Say the Same Thing\nCongratulations! you both managed to say "${this.yourWord}" after ${this.round} rounds!\n🔗: ${url}`;
     }
     this.clipboard.copy(messageToCopy);
   }

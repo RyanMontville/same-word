@@ -40,9 +40,11 @@
     }
     @if (showCorrectCard) {
     <div class="card" id="correctCard" [@cardAnimation]="correctCardState">
-        <p>Congratulations! you both managed to say <strong>{{yourWord}}</strong> after {{round}} rounds!</p>
+        <p>Congratulations! When you saw <strong>{{lastWordOne}}</strong> and <strong>{{lastWordTwo}}</strong> you both managed to say <strong>{{yourWord}}</strong>!</p><p>You guessed said the same word after {{round}} rounds.</p>
         <div class="btnWrapper">
-            <button (click)="copyToClipboard(2)">Click here to copy the message to share</button>
+            @if (!textedWon) {
+                <button (click)="copyToClipboard(2)">Click here to copy the message to share</button>
+            }
             <button (click)="playAgain()">Play Again</button>
         </div>
     </div>
