@@ -88,6 +88,11 @@ export class HomeComponent implements OnInit {
       let fixedt = lastTwo?.split("-").join(" ");
       this.lastWordOne = fixedo;
       this.lastWordTwo = fixedt;
+      let lastRound = this.round - 1;
+      let hasLastRound = this.game.rounds.some(round => round.round === lastRound);
+      if (!hasLastRound) {
+        this.game.rounds.push(new Round(lastRound, [fixedo, fixedt]));
+      }
       this.message = `<p>Your friend didn't guess the same word as you.</p><p>Find a word(s) to connect <strong>${fixedo}</strong> and <strong>${fixedt}</strong>:</p>`;
     }
     if (this.round == 1) {
