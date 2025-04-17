@@ -154,8 +154,8 @@ export class HomeComponent implements OnInit {
     if (action == 1) {
       messageToCopy= `🗣️Say the Same Thing Round ${this.round}\nIts your turn!\n🔗: ${this.urlString}`;
     } else {
-      let lo = this.theirWord?.split(" ").join("-");
-      let lt = this.yourWord.split(" ").join("-");
+      let lo = this.lastWordOne?.split(" ").join("-");
+      let lt = this.lastWordTwo?.split(" ").join("-");
       let url = `https://ryanmontville.com/same-word?round=${this.round}&won=${this.yourWord}&lastOne=${lo}&lastTwo=${lt}`
       messageToCopy = `🗣️Say the Same Thing\nCongratulations! you both managed to say "${this.yourWord}" after ${this.round} rounds!\n🔗: ${url}`;
     }
