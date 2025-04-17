@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -27,7 +27,8 @@ import { LocalStorageService } from '../local-storage.service';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
+  @ViewChild('currentRound') currentDiv!: ElementRef;
   game: Game = { gameID: "", rounds: [] };
   round: number = 1;
   lastWordOne: string | null = null;
@@ -55,6 +56,9 @@ export class HomeComponent implements OnInit {
     private clipboard: Clipboard,
     private localStore: LocalStorageService
   ) { }
+  ngAfterViewInit(): void {
+    this.currentDiv.nativeElement.scrollIntoView({ behavior: 'smooth' });
+  }
 
   ngOnInit() {
     let gameCodeParam = this.route.snapshot.queryParamMap.get('gameCode');
@@ -189,7 +193,7 @@ export class HomeComponent implements OnInit {
       let lo = this.lastWordOne?.split(" ").join("-");
       let lt = this.lastWordTwo?.split(" ").join("-");
       let url = `https://ryanmontville.com/same-word?gameCode=${this.game.gameID}&round=${this.round}&won=${this.yourWord}&lastOne=${lo}&lastTwo=${lt}`
-      messageToCopy = `🗣️Say the Same Thing\nCongratulations! you both managed to say "${this.yourWord}" after ${this.round} rounds!\n🔗: ${url}`;
+      messageToCopy = `🗣️Say the Same Thing\n🔗: ${url}`;
     }
     this.clipboard.copy(messageToCopy);
   }
