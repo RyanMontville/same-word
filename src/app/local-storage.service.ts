@@ -7,14 +7,14 @@ export class LocalStorageService {
   constructor() {}
 
   setItem(key: string, value: string): void {
-    let json: string = JSON.stringify(value);
-    localStorage.setItem(key, json);
+    // let json: string = JSON.stringify(value);
+    localStorage.setItem(key, value);
   }
 
   getItem(key: string): string | null {
     let json  = localStorage.getItem(key);
     if (json) {
-      return JSON.parse(json);
+      return json;
     }
     return null;
   }

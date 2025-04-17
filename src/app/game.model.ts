@@ -9,6 +9,6 @@ export class Game {
 export class Round {
     constructor(
         public round: number,
-        words: string[]
+        public words: string[]
     ) {}
 }
