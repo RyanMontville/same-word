@@ -35,19 +35,22 @@
 }
 
 body {
-    font-family: 'Roboto Slab';
-    background-color: var(--background-color);
-    color: var(--text-color);
+  position: relative;
+  font-family: 'Roboto Slab';
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-wrap: break-word;
 }
+
 @media only screen and (min-width: 671px) {
     main {
         max-width: 900px;
-        margin: 5px auto;
+        margin: 80px auto 10px auto;
     }
 }
 @media only screen and (max-width: 670px) {
     main {
-        margin: 20px;
+        margin: 80px 20px 20px 20px;
     }
 }
 
